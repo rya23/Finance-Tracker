@@ -12,4 +12,6 @@ urlpatterns = [
     path("updateexpense/<int:expense_id>", views.updateexpense, name="updateexpense"),
     path("deleteexpense/<int:expense_id>", views.deleteexpense, name="deleteexpense"),
     path("deleteincome/<int:income_id>", views.deleteincome, name="deleteincome"),
+    path("report", views.report, name="report"),
+    path("month/<int:month_no>", views.month, name="month"),
 ]

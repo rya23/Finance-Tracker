@@ -1,0 +1,26 @@
+{%extends "finance/base.html"%}
+{%block body%}
+
+<h1>Total Income : {{totalinc}} Total Expenses : {{totalexp}}</h1>
+<h1>Total Savings : {{saving}}</h1>
+
+<h1>Expenses</h1>
+<ol>
+    {% for expense in expenses %}
+    <li>
+        {{expense.date}} - {{expense.category}} - {{expense.description}} - {{expense.cost}}
+    </li>
+    {% endfor %}
+
+</ol>
+<h1>Income</h1>
+<ol>
+    {% for income in incomes %}
+    <li>
+        {{income.date}} - {{income.source}} - {{income.description}} - {{income.cost}}
+    </li>
+    {% endfor %}
+
+</ol>
+
+{%endblock%}>

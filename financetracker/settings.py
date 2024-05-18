@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "finance",
     "crispy_forms",
-    "crispy_bootstrap4",    
+    "crispy_bootstrap4",
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig",
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,5 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 LOGIN_REDIRECT_URL = "home"
 
 LOGIN_URL = "login"
+
+X_FRAME_OPTIONS = "SAMEORIGIN"

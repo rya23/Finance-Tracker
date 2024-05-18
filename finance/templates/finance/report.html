@@ -1,0 +1,37 @@
+{%extends "finance/base.html"%}
+{% block body %}
+
+{{ plot_div|safe }}
+<div class="container">
+    <h1 class="mt-5 mb-4">Monthly Finance Report</h1>
+    <div class="row mb-5">
+        <div class="col">
+            <h2>Monthly Expenses</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Total Expenses</th>
+                        <th>Total Income</th>
+                        <th>Savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in monthly_reports %}
+                    <tr>
+                        <td> <a href="{%url 'month' report.month_no %}"> {{ report.month_name }}</a>
+                        </td>
+                        <td>{{ report.total_income }}</td>
+                        <td>{{ report.total_expense }}</td>
+                        <td>{{ report.difference }}</td>
+
+
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% endblock %}
