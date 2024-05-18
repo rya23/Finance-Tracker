@@ -1,0 +1,32 @@
+{%extends "finance/base.html"%}
+{% block body %}
+<div class="content-section">
+    {%if type == "expense" %}
+    <h1>Delete Expenses</h1>
+    <form action="{%url 'deleteexpense' expense.id %}" method="post">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="form-group">
+                <h2>Are you sure you want to delete "{{ expense.description }}"</h2>
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
+            <a class="btn btn-outline-secondary" href="{% url 'updateexpense' expense.id %}">Cancel</a>
+        </div>
+    </form>
+    {%else%}
+    <h1>Delete Income</h1>
+    <form action="{%url 'deleteincome' income.id%}" method="post">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Delete</legend>
+            <h2>Are you sure you want to delete "{{ income.description }}"</h2>
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-danger" type="submit">Yes, Delete</button>
+            <a class="btn btn-outline-secondary" href="{% url 'updateincome' income.id %}">Cancel</a>
+        </div>
+    </form>
+    {%endif%}
+</div>
+{% endblock body %}

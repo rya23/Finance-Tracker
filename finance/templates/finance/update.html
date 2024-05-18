@@ -1,0 +1,32 @@
+{%extends "finance/base.html"%}
+{% load crispy_forms_tags %}
+{% load i18n %}
+{%block body%}
+
+<div class="container py-5">
+    {%if type == "expense" %}
+    <h1>Update Expenses</h1>
+    <form action="{%url 'updateexpense' expense.id %}" method="post">
+        {%else%}
+        <h1>Update Income</h1>
+        <form action="{%url 'updateincome' income.id%}" method="post">
+            {%endif%}
+            {%csrf_token%}
+            {{form|crispy}}
+
+            <input type="submit" value="Submit">
+            <div>
+                {%if type == "expense" %}
+                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'deleteexpense' expense.id %}">Delete</a>
+
+                {%else%}
+                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'deleteincome' income.id %}">Delete</a>
+
+                {%endif%}
+
+
+            </div>
+</div>
+</form>
+</div>
+{%endblock%}
