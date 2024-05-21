@@ -10,14 +10,21 @@
         {{form|crispy}}
 
         <input type="submit" value="Submit">
-        {%else%}
-        <h1>Add Income</h1>
-        <form action="{%url 'addincome' %}" method="post">
-            {%csrf_token%}
-            {{form|crispy}}
+    </form>
+    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'addcategory' %}">Add Category</a>
 
-            <input type="submit" value="Submit">
-        </form>
-        {%endif%}
+    {%else%}
+    <h1>Add Income</h1>
+    <form action="{%url 'addincome' %}" method="post">
+        {%csrf_token%}
+        {{form|crispy}}
+
+        <input type="submit" value="Submit">
+    </form>
+    <div>
+        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'addsource' %}">Add Income Source</a>
+
+    </div>
+    {%endif%}
 </div>
 {%endblock%}

@@ -8,18 +8,24 @@ from .models import *
 from calendar import month_name
 from .forms import *
 from itertools import zip_longest
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from plotly.offline import plot
+from plotly.graph_objs import Bar, Pie
 
 # Create your views here.
 
 
+@login_required
 def home(request):
+    incomes = Income.objects.filter(user=request.user)
+    expenses = Expense.objects.filter(user=request.user)
     return render(
-        request,
-        "finance/home.html",
-        {"incomes": Income.objects.all(), "expenses": Expense.objects.all()},
+        request, "finance/home.html", {"incomes": incomes, "expenses": expenses}
     )
 
 
+@login_required
 def addexpense(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
@@ -28,8 +34,13 @@ def addexpense(request):
             category = form.cleaned_data["category"]
             description = form.cleaned_data["description"]
             date = form.cleaned_data["date"]
+            user = request.user
             expense = Expense(
-                cost=cost, description=description, category=category, date=date
+                cost=cost,
+                description=description,
+                category=category,
+                date=date,
+                user=user,
             )
             expense.save()
             return redirect("home")
@@ -39,6 +50,7 @@ def addexpense(request):
     return render(request, "finance/add.html", {"form": form, "type": "expense"})
 
 
+@login_required
 def addincome(request):
     if request.method == "POST":
         form = IncomeForm(request.POST)
@@ -47,8 +59,13 @@ def addincome(request):
             source = form.cleaned_data["source"]
             description = form.cleaned_data["description"]
             date = form.cleaned_data["date"]
+            user = request.user
             expense = Income(
-                cost=cost, description=description, source=source, date=date
+                cost=cost,
+                description=description,
+                source=source,
+                date=date,
+                user=user,
             )
             expense.save()
             return HttpResponseRedirect(reverse("home"))
@@ -58,94 +75,127 @@ def addincome(request):
     return render(request, "finance/add.html", {"form": form, "type": "income"})
 
 
+@login_required
 def updateincome(request, income_id):
     income = get_object_or_404(Income, id=income_id)
-    if request.method == "POST":
-        form = IncomeForm(request.POST, instance=income)
-        if form.is_valid():
-            form.save()
-            return redirect("home")
+    if request.user == income.user:
+        if request.method == "POST":
+            form = IncomeForm(request.POST, instance=income)
+            if form.is_valid():
+                form.save()
+                return redirect("home")
+        else:
+            form = IncomeForm(instance=income)
+            return render(
+                request,
+                "finance/update.html",
+                {
+                    "form": form,
+                    "type": "income",
+                    "income": Income.objects.get(id=income_id),
+                },
+            )
     else:
-        form = IncomeForm(instance=income)
-        return render(
-            request,
-            "finance/update.html",
-            {
-                "form": form,
-                "type": "income",
-                "income": Income.objects.get(id=income_id),
-            },
-        )
+        return redirect(home)
 
 
+@login_required
 def updateexpense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id)
-    if request.method == "POST":
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            form.save()
-            return redirect("home")
+    if request.user == expense.user:
+        if request.method == "POST":
+            form = ExpenseForm(request.POST, instance=expense)
+            if form.is_valid():
+                form.save()
+                return redirect("home")
+        else:
+            form = ExpenseForm(instance=expense)
+            return render(
+                request,
+                "finance/update.html",
+                {
+                    "form": form,
+                    "type": "expense",
+                    "expense": Expense.objects.get(id=expense_id),
+                },
+            )
     else:
-        form = ExpenseForm(instance=expense)
-        return render(
-            request,
-            "finance/update.html",
-            {
-                "form": form,
-                "type": "expense",
-                "expense": Expense.objects.get(id=expense_id),
-            },
-        )
+        return redirect("home")
 
 
+@login_required
 def deleteexpense(request, expense_id):
     expense = Expense.objects.get(id=expense_id)
-    if request.method == "POST":
-        expense.delete()
-        messages.success(request, f"{expense.description} deleted")
+    if request.user == expense.user:
+        if request.method == "POST":
+            expense.delete()
+            messages.success(request, f"{expense.description} deleted")
+            return redirect("home")
+        return render(
+            request, "finance/delete.html", {"expense": expense, "type": "expense"}
+        )
+    else:
         return redirect("home")
+
+
+@login_required
+def deleteincome(request, income_id):
+    income = Income.objects.get(id=income_id)
+    if request.user == income.user:
+        if request.method == "POST":
+            income.delete()
+            messages.success(request, f"{income.description} deleted")
+            return redirect("home")
+        return render(
+            request, "finance/delete.html", {"income": income, "type": "income"}
+        )
+    else:
+        return redirect("home")
+
+
+def addcategory(request):
+    if request.method == "POST":
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.cleaned_data["name"]
+            category = Category.objects.get_or_create(name=category)
+            Category(name=category)
+            return redirect("addexpense")
+    else:
+        form = CategoryForm()
     return render(
-        request, "finance/delete.html", {"expense": expense, "type": "expense"}
+        request, "finance/add_category.html", {"form": form, "type": "category"}
     )
 
 
-def deleteincome(request, income_id):
-    income = Income.objects.get(id=income_id)
+def addsource(request):
     if request.method == "POST":
-        income.delete()
-        messages.success(request, f"{income.description} deleted")
-        return redirect("home")
-    return render(request, "finance/delete.html", {"income": income, "type": "income"})
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            source = form.cleaned_data["name"]
+            source = Source.objects.get_or_create(name=source)
+            Source(name=source)
+            return redirect("addincome")
+    else:
+        form = CategoryForm()
+    return render(
+        request, "finance/add_category.html", {"form": form, "type": "source"}
+    )
 
 
-# def addcategory(request):
-#     if request.method == "POST":
-#         form = CategoryForm(request.POST)
-#         if form.is_valid():
-#             category = form.cleaned_data["category"]
-#             category = category.objects.get_or_create(name=category)
-#             cat = Category(name = Category)
-#             form.save()
-#             return redirect("add")
-#     else:
-#         form = CategoryForm()
-#     return render(
-#         request, "finance/add_category.html", {"form": form, "type": "category"}
-#     )
-
-from plotly.offline import plot
-from plotly.graph_objs import Bar
-
-
+@login_required
 def report(request):
+    user = request.user
     expenses_by_month = (
-        Expense.objects.annotate(month=ExtractMonth("date"))
+        Expense.objects.filter(user=request.user)
+        .annotate(month=ExtractMonth("date"))
         .values("month")
         .annotate(total_cost=Sum("cost"))
         .order_by("month")
     )
     incomes_by_month = (
-        Income.objects.annotate(month=ExtractMonth("date"))
+        Income.objects.filter(user=request.user)
+        .annotate(month=ExtractMonth("date"))
         .values("month")
         .annotate(total_cost=Sum("cost"))
         .order_by("month")
@@ -156,8 +206,8 @@ def report(request):
     y_incomes = []
     for exp, inc in zip(expenses_by_month, incomes_by_month):
         month = month_name[exp["month"]]
-        total_expense = exp["total_cost"] or 0
-        total_income = inc["total_cost"] or 0
+        total_expense = exp["total_cost"]
+        total_income = inc["total_cost"]
         difference = total_income - total_expense
         monthly_reports.append(
             {
@@ -184,25 +234,56 @@ def report(request):
                 x=x,
                 y=y_incomes,
                 name="Incomes",
-                marker_color="blue",
+                marker_color="green",
             ),
         ],
         output_type="div",
     )
 
+    expenses_by_category = (
+        Expense.objects.filter(user=user)
+        .values("category__name")
+        .annotate(total_cost=Sum("cost"))
+        .order_by("-total_cost")
+    )
+    incomes_by_source = (
+        Income.objects.filter(user=user)
+        .values("source__name")
+        .annotate(total_cost=Sum("cost"))
+        .order_by("-total_cost")
+    )
+
+    expense_labels = [expense["category__name"] for expense in expenses_by_category]
+    expense_values = [expense["total_cost"] for expense in expenses_by_category]
+
+    income_labels = [income["source__name"] for income in incomes_by_source]
+    income_values = [income["total_cost"] for income in incomes_by_source]
+
+    expense_pie = Pie(labels=expense_labels,values=expense_values,name="Expenses")
+    income_pie = Pie(labels=income_labels, values=income_values, name="Incomes")
+
+    expense_plot = plot([expense_pie], output_type="div")
+    income_plot = plot([income_pie], output_type="div")
+
     return render(
         request,
         "finance/report.html",
-        {"monthly_reports": monthly_reports, "plot_div": plot_div},
+        {
+            "expense_plot": expense_plot,
+            "income_plot": income_plot,
+            "monthly_reports": monthly_reports,
+            "plot_div": plot_div,
+        },
     )
 
 
 # Call the function to generate the report
 
 
+@login_required
 def month(request, month_no):
-    incomes = Income.objects.filter(date__month=month_no)
-    expenses = Expense.objects.filter(date__month=month_no)
+    incomes = Income.objects.filter(date__month=month_no, user=request.user)
+    expenses = Expense.objects.filter(date__month=month_no, user=request.user)
 
     totalinc = incomes.aggregate(total_cost=Sum("cost"))["total_cost"]
 

@@ -2,6 +2,13 @@
 {% block body %}
 
 {{ plot_div|safe }}
+<div>
+    <h2>Expenses by Category</h2>
+    {{ expense_plot|safe }}
+
+    <h2>Incomes by Source</h2>
+    {{ income_plot|safe }}
+</div>
 <div class="container">
     <h1 class="mt-5 mb-4">Monthly Finance Report</h1>
     <div class="row mb-5">
@@ -11,8 +18,8 @@
                 <thead>
                     <tr>
                         <th>Month</th>
-                        <th>Total Expenses</th>
                         <th>Total Income</th>
+                        <th>Total Expenses</th>
                         <th>Savings</th>
                     </tr>
                 </thead>

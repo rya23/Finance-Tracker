@@ -67,7 +67,7 @@ class IncomeForm(forms.ModelForm):
         }
 
 
-# class CategoryForm(forms.ModelForm):
-#     class Meta:
-#         model = Category
-#         fields = ["name"]
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ["name"]

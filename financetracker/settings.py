@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "finance",
+    "users",
     "crispy_forms",
     "crispy_bootstrap4",
     "django_plotly_dash.apps.DjangoPlotlyDashConfig",
@@ -132,6 +133,9 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 LOGIN_REDIRECT_URL = "home"
 
+LOGOUT_REDIRECT_URL="home"
+
 LOGIN_URL = "login"
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
+

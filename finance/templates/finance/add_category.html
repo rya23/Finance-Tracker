@@ -1,0 +1,23 @@
+{%extends "finance/base.html"%}
+{% load crispy_forms_tags %}
+{%block body%}
+
+<div class="container py-5">
+    {%if type == "source" %}
+    <h1>Add Source</h1>
+    <form action="{%url 'addsource' %}" method="post">
+        {%csrf_token%}
+        {{form|crispy}}
+        <input type="submit" value="Submit">
+    </form>
+    {%else%}
+    <h1>Add Category</h1>
+    <form action="{%url 'addcategory' %}" method="post">
+        {%csrf_token%}
+        {{form|crispy}}
+
+        <input type="submit" value="Submit">
+    </form>
+    {%endif%}
+</div>
+{%endblock%}
