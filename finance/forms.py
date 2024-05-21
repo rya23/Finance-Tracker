@@ -71,3 +71,16 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ["name"]
+
+
+class BudgetForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        empty_label=None,
+        widget=forms.Select(attrs={"class": "select2"}),
+        label="Category",
+    )
+
+    class Meta:
+        model = Category
+        fields = ["category", "budget"]

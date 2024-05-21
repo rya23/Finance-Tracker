@@ -32,6 +32,15 @@ def addexpense(request):
         if form.is_valid():
             cost = form.cleaned_data["cost"]
             category = form.cleaned_data["category"]
+
+            if category.budget:
+                total_expenses = Expense.objects.filter(category=category).aggregate(
+                    total_cost=Sum("cost")
+                )["total_cost"]
+                if total_expenses + cost > category.budget:
+                    messages.warning(
+                        request, f"Budget Exceeded for {category.name} category."
+                    )
             description = form.cleaned_data["description"]
             date = form.cleaned_data["date"]
             user = request.user
@@ -259,7 +268,7 @@ def report(request):
     income_labels = [income["source__name"] for income in incomes_by_source]
     income_values = [income["total_cost"] for income in incomes_by_source]
 
-    expense_pie = Pie(labels=expense_labels,values=expense_values,name="Expenses")
+    expense_pie = Pie(labels=expense_labels, values=expense_values, name="Expenses")
     income_pie = Pie(labels=income_labels, values=income_values, name="Incomes")
 
     expense_plot = plot([expense_pie], output_type="div")
@@ -299,5 +308,64 @@ def month(request, month_no):
             "totalinc": totalinc,
             "totalexp": totalexp,
             "saving": saving,
+        },
+    )
+
+
+@login_required
+def addbudget(request):
+    if request.method == "POST":
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            category_name = form.cleaned_data["category"]
+            budget = form.cleaned_data["budget"]
+            category = Category.objects.get(name=category_name)
+            category.budget = budget
+            category.save()
+            return redirect("home")
+    else:
+        form = BudgetForm()
+
+    return render(request, "finance/addbudget.html", {"form": form})
+
+
+# @login_required
+# def deletebudget(request, category_id):
+#     category = category.objects.get(id=expense_id)
+#     if request.user == expense.user:
+#         if request.method == "POST":
+#             category.budget = NULL
+#             messages.success(f"Budget of {category.name} deleted")
+#             return redirect("home")
+#         return render(
+#             request, "finance/delete.html", {"category": category, "type": "category"}
+#         )
+#     else:
+#         return redirect("home")
+
+
+def category(request):
+    user = request.user
+    expenses_by_category = (
+        Expense.objects.filter(user=user)
+        .values("category__name")
+        .annotate(total_cost=Sum("cost"))
+        .annotate(budget=models.F("category__budget"))
+        .order_by("-total_cost")
+    )
+
+    expense_labels = [expense["category__name"] for expense in expenses_by_category]
+    expense_values = [expense["total_cost"] for expense in expenses_by_category]
+
+    expense_pie = Pie(labels=expense_labels, values=expense_values, name="Expenses")
+
+    expense_plot = plot([expense_pie], output_type="div")
+
+    return render(
+        request,
+        "finance/category.html",
+        {
+            "expenses": expenses_by_category,
+            "expense_plot": expense_plot,
         },
     )

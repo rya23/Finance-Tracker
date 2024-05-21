@@ -1,0 +1,26 @@
+{%extends "finance/base.html"%}
+{%block body%}
+
+
+
+<h1>Expense Report</h1>
+<ul>
+    {% for expense in expenses %}
+    <li>{{ expense.category__name }}:
+        Total Cost: {{ expense.total_cost }},
+        {% if expense.budget %}
+        Budget: {{ expense.budget }}
+        <!-- <a href="{% url 'deletebudget' expense.id %}" style="color:red">Delete Budget</a> -->
+
+        {% else %}
+        No Budget Set
+        {% endif %}
+
+    </li>
+    {% endfor %}
+</ul>
+
+<h2>Expenses by Category</h2>
+{{ expense_plot|safe }}
+
+{%endblock%}>

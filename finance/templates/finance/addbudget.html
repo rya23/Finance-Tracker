@@ -1,0 +1,14 @@
+{%extends "finance/base.html"%}
+{% load crispy_forms_tags %}
+{%block body%}
+
+<div class="container py-5">
+    <h1>Add Budget</h1>
+    <form action="{%url 'addbudget' %}" method="post">
+        {%csrf_token%}
+        {{form|crispy}}
+
+        <input type="submit" value="Submit">
+    </form>
+</div>
+{%endblock%}
