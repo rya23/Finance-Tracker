@@ -3,7 +3,7 @@
 Finance Tracker is a web application built with Django that helps you manage your finances by tracking expenses and incomes.
 
 
-## Demo
+## Live Demo
 
 Check out the [demo](https://rya234.pythonanywhere.com/) to see Finance Tracker in action!
 
