@@ -27,7 +27,7 @@ Check out the [demo](https://rya234.pythonanywhere.com/) to see Finance Tracker 
 2. Navigate to the project directory:
 
    ```
-   cd finance-tracker
+   cd FJ-BE-R2-Aarya-Thakur-Thadomal-Shahani-Engineering-College
    ```
 
 3. Install dependencies:
