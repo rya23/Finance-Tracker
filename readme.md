@@ -75,6 +75,11 @@ Check out the [demo](https://rya234.pythonanywhere.com/) to see Finance Tracker 
 
 ![reports](/finance/static/Screenshot%202024-05-22%20at%2017-06-10%20Finance%20Tracker.png)
 
+
+### Monthly Report
+![reports](/finance/static/Screenshot%202024-05-22%20at%2017-48-59%20Finance%20Tracker.png)
+
+
 ### Category wise report
 ![category](/finance/static/Screenshot%202024-05-22%20at%2017-06-47%20Finance%20Tracker.png)
 
