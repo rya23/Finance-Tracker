@@ -1,6 +1,9 @@
 {%extends "finance/base.html"%}
 {% load crispy_forms_tags %}
+{% load socialaccount %}
+
 {%block body%}
+
 <div class="container py-5">
 	<h1>Register</h1>
 	<form method="POST">
@@ -8,6 +11,9 @@
 		{{ form|crispy }}
 		<button class="btn btn-primary" type="submit">Register</button>
 	</form>
+	<a href="{% provider_login_url 'google' method='oauth2' %}" class="btn btn-primary">Sign in with Google</a>
+
 	<p class="text-center">If you already have an account, <a href="{%url 'login' %}">login</a> instead.</p>
+
 </div>
 {%endblock body%}

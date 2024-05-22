@@ -36,6 +36,10 @@ class DateInput(forms.DateInput):
 
 
 class ExpenseForm(forms.ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        super(ExpenseForm, self).__init__(*args, **kwargs)
+        self.fields["category"].queryset = Category.objects.filter(user=user)
+
     class Meta:
         model = Expense
         fields = ["date", "cost", "category", "description"]
@@ -74,8 +78,14 @@ class CategoryForm(forms.ModelForm):
 
 
 class BudgetForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)  # Remove 'user' from kwargs
+        super(BudgetForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields["category"].queryset = Category.objects.filter(user=user)
+
     category = forms.ModelChoiceField(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.none(),  # This will be dynamically updated in __init__
         empty_label=None,
         widget=forms.Select(attrs={"class": "select2"}),
         label="Category",

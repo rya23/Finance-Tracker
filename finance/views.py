@@ -28,7 +28,7 @@ def home(request):
 @login_required
 def addexpense(request):
     if request.method == "POST":
-        form = ExpenseForm(request.POST)
+        form = ExpenseForm(user=request.user)
         if form.is_valid():
             cost = form.cleaned_data["cost"]
             category = form.cleaned_data["category"]
@@ -54,7 +54,7 @@ def addexpense(request):
             expense.save()
             return redirect("home")
     else:
-        form = ExpenseForm()
+        form = ExpenseForm(user=request.user)
 
     return render(request, "finance/add.html", {"form": form, "type": "expense"})
 
@@ -166,9 +166,11 @@ def addcategory(request):
     if request.method == "POST":
         form = CategoryForm(request.POST)
         if form.is_valid():
-            category = form.cleaned_data["name"]
-            category = Category.objects.get_or_create(name=category)
-            Category(name=category)
+            category_name = form.cleaned_data["name"]
+            user = request.user
+            category, created = Category.objects.get_or_create(name=category_name)
+            category.user = user
+            category.save()
             return redirect("addexpense")
     else:
         form = CategoryForm()
@@ -315,7 +317,7 @@ def month(request, month_no):
 @login_required
 def addbudget(request):
     if request.method == "POST":
-        form = BudgetForm(request.POST)
+        form = BudgetForm(request.POST, user=request.user)
         if form.is_valid():
             category_name = form.cleaned_data["category"]
             budget = form.cleaned_data["budget"]
@@ -324,7 +326,7 @@ def addbudget(request):
             category.save()
             return redirect("home")
     else:
-        form = BudgetForm()
+        form = BudgetForm(user=request.user)
 
     return render(request, "finance/addbudget.html", {"form": form})
 

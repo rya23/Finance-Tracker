@@ -33,6 +33,10 @@
 
                     </div>
                     <div class="navbar-nav ml-auto text-right">
+                        <div>
+                            {{ user }}
+                        </div>
+
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
                             <button type="submit" class="nav-item nav-link"
