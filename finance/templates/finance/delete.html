@@ -27,7 +27,7 @@
             <a class="btn btn-outline-secondary" href="{% url 'updateincome' income.id %}">Cancel</a>
         </div>
     </form>
-    {%elif%}
+    {%else%}
     <h1>Delete Budget</h1>
     <form action="{%url 'deletebudget' category.id%}" method="post">
         {% csrf_token %}
