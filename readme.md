@@ -53,3 +53,25 @@ Finance Tracker is a web application built with Django that helps you manage you
 7. Get In App Alerts When Budget is exceeded
 5. View monthly reports to analyze your financial activities.
 6. Edit or delete entries as needed.
+
+
+# Screenshots  
+
+
+### Register Page
+
+![register](/finance/static/Screenshot%202024-05-22%20at%2017-18-04%20Finance%20Tracker.png)
+
+### Home Page
+![home](/finance/static/Screenshot%202024-05-22%20at%2017-05-03%20Finance%20Tracker.png)
+
+### Reports Page
+
+![reports](/finance/static/Screenshot%202024-05-22%20at%2017-06-10%20Finance%20Tracker.png)
+
+### Category wise report
+![category](/finance/static/Screenshot%202024-05-22%20at%2017-06-47%20Finance%20Tracker.png)
+
+
+### Budget Exceeded Alert
+![Budget Exceeded](/finance/static/Screenshot%202024-05-22%20at%2017-07-21%20Finance%20Tracker.png)
