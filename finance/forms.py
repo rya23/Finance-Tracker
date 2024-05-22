@@ -5,30 +5,6 @@ from .models import *
 from django.forms.fields import DateField
 
 
-# class DateInput(forms.DateInput):
-#     input_type = "date"
-
-
-# class BaseTransactionForm(forms.Form):
-#     date = forms.DateField(widget=DateInput, label="Date", required=True)
-#     cost = forms.IntegerField(label="Cost")
-#     description = forms.CharField(label="Description", max_length=200, required=False)
-
-
-# class ExpenseForm(BaseTransactionForm):
-#     category = forms.ModelChoiceField(
-#         queryset=Category.objects.all(),
-#         widget=forms.Select(attrs={"class": "select2"}),
-#         required=False,
-#     )
-
-
-# class IncomeForm(BaseTransactionForm):
-#     source = forms.ModelChoiceField(
-#         queryset=Source.objects.all(),
-#         widget=forms.Select(attrs={"class": "select2"}),
-#         required=False,
-#     )
 
 
 class DateInput(forms.DateInput):

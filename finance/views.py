@@ -217,23 +217,19 @@ def report(request):
     )
     current_year = datetime.now().year
 
-    # Initialize lists for storing data
     monthly_reports = []
     x = []
     y_expenses = []
     y_incomes = []
 
-    # Loop through all months of the year
     for month in range(1, 13):
         month_name = calendar.month_name[month]
-        # Check if there are expenses for this month
         expenses = Expense.objects.filter(
             user=request.user, date__year=current_year, date__month=month
         ).aggregate(total_cost=Sum("cost"))
         total_expense = (
             expenses["total_cost"] if expenses["total_cost"] is not None else 0
         )
-        # Check if there are incomes for this month
         incomes = Income.objects.filter(
             user=request.user, date__year=current_year, date__month=month
         ).aggregate(total_cost=Sum("cost"))
@@ -241,7 +237,6 @@ def report(request):
 
         difference = total_income - total_expense
 
-        # Append data to respective lists
         monthly_reports.append(
             {
                 "month_name": month_name,
@@ -309,8 +304,6 @@ def report(request):
         },
     )
 
-
-# Call the function to generate the report
 
 
 @login_required
