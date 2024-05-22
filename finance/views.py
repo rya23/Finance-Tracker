@@ -28,7 +28,7 @@ def home(request):
 @login_required
 def addexpense(request):
     if request.method == "POST":
-        form = ExpenseForm(user=request.user)
+        form = ExpenseForm(request.user, request.POST)
         if form.is_valid():
             cost = form.cleaned_data["cost"]
             category = form.cleaned_data["category"]
@@ -113,12 +113,12 @@ def updateexpense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id)
     if request.user == expense.user:
         if request.method == "POST":
-            form = ExpenseForm(request.POST, instance=expense)
+            form = ExpenseForm(request.user, request.POST, instance=expense)
             if form.is_valid():
                 form.save()
                 return redirect("home")
         else:
-            form = ExpenseForm(instance=expense)
+            form = ExpenseForm(user=request.user, instance=expense)
             return render(
                 request,
                 "finance/update.html",
@@ -194,6 +194,10 @@ def addsource(request):
     )
 
 
+import calendar
+from datetime import datetime
+
+
 @login_required
 def report(request):
     user = request.user
@@ -211,25 +215,43 @@ def report(request):
         .annotate(total_cost=Sum("cost"))
         .order_by("month")
     )
+    current_year = datetime.now().year
+
+    # Initialize lists for storing data
     monthly_reports = []
     x = []
     y_expenses = []
     y_incomes = []
-    for exp, inc in zip(expenses_by_month, incomes_by_month):
-        month = month_name[exp["month"]]
-        total_expense = exp["total_cost"]
-        total_income = inc["total_cost"]
+
+    # Loop through all months of the year
+    for month in range(1, 13):
+        month_name = calendar.month_name[month]
+        # Check if there are expenses for this month
+        expenses = Expense.objects.filter(
+            user=request.user, date__year=current_year, date__month=month
+        ).aggregate(total_cost=Sum("cost"))
+        total_expense = (
+            expenses["total_cost"] if expenses["total_cost"] is not None else 0
+        )
+        # Check if there are incomes for this month
+        incomes = Income.objects.filter(
+            user=request.user, date__year=current_year, date__month=month
+        ).aggregate(total_cost=Sum("cost"))
+        total_income = incomes["total_cost"] if incomes["total_cost"] is not None else 0
+
         difference = total_income - total_expense
+
+        # Append data to respective lists
         monthly_reports.append(
             {
-                "month_name": month,
-                "month_no": exp["month"],
+                "month_name": month_name,
+                "month_no": month,
                 "total_expense": total_expense,
                 "total_income": total_income,
                 "difference": difference,
             }
         )
-        x.append(month)
+        x.append(month_name)
         y_expenses.append(total_expense)
         y_incomes.append(total_income)
 
@@ -296,9 +318,9 @@ def month(request, month_no):
     incomes = Income.objects.filter(date__month=month_no, user=request.user)
     expenses = Expense.objects.filter(date__month=month_no, user=request.user)
 
-    totalinc = incomes.aggregate(total_cost=Sum("cost"))["total_cost"]
+    totalinc = incomes.aggregate(total_cost=Sum("cost"))["total_cost"] or 0
 
-    totalexp = expenses.aggregate(total_cost=Sum("cost"))["total_cost"]
+    totalexp = expenses.aggregate(total_cost=Sum("cost"))["total_cost"] or 0
 
     saving = totalinc - totalexp
     return render(
